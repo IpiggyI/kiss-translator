@@ -617,7 +617,7 @@ export const DEFAULT_TRANS_APIS = {
     fetchInterval: 500,
   },
   [OPT_TRANS_OLLAMA]: defaultOllamaApi,
-  [OPT_TRANS_OLLAMA_2]: defaultOllamaApi,
+  [OPT_TRANS_OLLAMA_2]: defaultOllamaApi2,
   [OPT_TRANS_OLLAMA_3]: defaultOllamaApi,
   [OPT_TRANS_CUSTOMIZE]: defaultCustomApi,
   [OPT_TRANS_CUSTOMIZE_2]: defaultCustomApi,
