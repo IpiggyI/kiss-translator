@@ -4,52 +4,54 @@ on:
   push:
     tags:
       - "v*"
+  # 添加手动触发选项
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
 
 jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
+      
       - uses: pnpm/action-setup@v2
         with:
           version: 8.7.6
+          
       - uses: actions/setup-node@v3
         with:
           node-version: "18.17.0"
           cache: "pnpm"
+          
       - run: pnpm install
       - run: pnpm build
+      
       - uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
           path: build
-  deploy-web:
-    needs: build
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: build-artifacts
-          path: build
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: build/web
+
   create-release:
+    needs: build
     runs-on: ubuntu-22.04
     outputs:
       upload_url: ${{ steps.create-release.outputs.upload_url }}
     steps:
-      - uses: actions/create-release@v1
+      - uses: softprops/action-gh-release@v1
         id: create-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.event.inputs.version || github.ref }}
+          name: Release ${{ github.event.inputs.version || github.ref }}
           draft: false
           prerelease: false
+          generate_release_notes: true
+
   upload-release:
     needs: [build, create-release]
     strategy:
@@ -58,19 +60,22 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
+      
       - uses: actions/download-artifact@v3
         with:
           name: build-artifacts
           path: build
+          
       - name: Zip Release
         run: |
           cd build
           zip -r ${{ matrix.client }}.zip ${{ matrix.client }}
-      - uses: actions/upload-release-asset@v1
+          
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./build/${{ matrix.client }}.zip
-          asset_name: kiss-translator_${{ github.ref_name }}_${{ matrix.client }}.zip
-          asset_content_type: application/zip
+          tag_name: ${{ github.event.inputs.version || github.ref }}
+          files: build/${{ matrix.client }}.zip
+          name: kiss-translator_${{ github.event.inputs.version || github.ref_name }}_${{ matrix.client }}.zip
