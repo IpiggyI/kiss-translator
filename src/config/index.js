@@ -528,10 +528,30 @@ const defaultOpenaiApi = {
   fetchLimit: 1,
   fetchInterval: 500,
 };
+const defaultOpenaiApi2 = {
+  url: "https://api.openai.com/v1/chat/completions",
+  key: "",
+  model: "gpt-4o-mini",
+  stream: true,
+  prompt: `You will be provided with a sentence in ${INPUT_PLACE_FROM}, and your task is to translate it into ${INPUT_PLACE_TO}.`,
+  temperature: 0,
+  maxTokens: 256,
+  fetchLimit: 1,
+  fetchInterval: 500,
+};
 const defaultOllamaApi = {
   url: "http://localhost:11434/api/generate",
   key: "",
   model: "llama3",
+  prompt: `Translate the following text from ${INPUT_PLACE_FROM} to ${INPUT_PLACE_TO}:\n\n${INPUT_PLACE_TEXT}`,
+  fetchLimit: 1,
+  fetchInterval: 500,
+};
+const defaultOllamaApi2 = {
+  url: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+  key: "",
+  stream: true,
+  model: "glm-4-flash",
   prompt: `Translate the following text from ${INPUT_PLACE_FROM} to ${INPUT_PLACE_TO}:\n\n${INPUT_PLACE_TEXT}`,
   fetchLimit: 1,
   fetchInterval: 500,
@@ -580,7 +600,7 @@ export const DEFAULT_TRANS_APIS = {
     fetchInterval: DEFAULT_FETCH_INTERVAL,
   },
   [OPT_TRANS_OPENAI]: defaultOpenaiApi,
-  [OPT_TRANS_OPENAI_2]: defaultOpenaiApi,
+  [OPT_TRANS_OPENAI_2]: defaultOpenaiApi2,
   [OPT_TRANS_OPENAI_3]: defaultOpenaiApi,
   [OPT_TRANS_GEMINI]: {
     url: `https://generativelanguage.googleapis.com/v1/models/${INPUT_PLACE_MODEL}:generateContent?key=${INPUT_PLACE_KEY}`,
